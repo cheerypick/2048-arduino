@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="../template.xhtml">
+    <ui:define name="content">
+        <h:form>
+            <p:messages/>
+            <h:outputLabel for="name" value="Name:"/>
+            <h:inputText id="name" value="#{subjectController.subject.name}"/>
+            <br/>
+            <h:outputLabel for="location" value="Location:"/>
+            <h:selectOneMenu id="location" value="#{subjectController.locationId}">
+                <f:selectItems var="location" value="#{subjectController.getLocations()}"/>
+            </h:selectOneMenu>
+            <br/>
+            <h:outputLabel for="users" value="Users:"/>
+            <h:selectManyCheckbox id="users" value="#{subjectController.userIds}">
+                <f:selectItems value="#{subjectController.getUsers()}" />
+            </h:selectManyCheckbox>
+            <br/>
+            <h:commandButton value="Submit" action="#{subjectController.persist()}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

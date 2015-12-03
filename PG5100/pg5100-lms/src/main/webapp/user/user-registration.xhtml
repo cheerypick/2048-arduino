@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="../template.xhtml">
+    <ui:define name="content">
+        <h:form>
+            <p:messages/>
+            <h:outputLabel for="email" value="E-mail"/>
+            <h:inputText id="email" value="#{userController.user.email}"/>
+            <br/>
+            <h:outputLabel for="password" value="Password"/>
+            <h:inputSecret id="password" value="#{userController.user.password}"/>
+            <br/>
+            <h:outputLabel for="userType" value="Type"/>
+            <h:selectOneMenu id="userType" value="#{userController.user.userType}">
+                <f:selectItems value="#{userController.getUserTypes()}"/>
+            </h:selectOneMenu>
+            <br/>
+            <h:commandButton value="Submit" action="#{userController.persistNewUser()}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

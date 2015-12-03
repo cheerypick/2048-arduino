@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+        >
+<ui:composition template="../template.xhtml">
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewParam name="id" value="#{userController.selectedId}"/>
+            <f:viewAction action="#{userController.initUser()}"/>
+        </f:metadata>
+
+        <h2><h:outputText value="#{userController.user.email}"/></h2>
+        <ul>
+            <li>Id: <h:outputText value="#{userController.user.id}"/></li>
+            <li>Type: <h:outputText value="#{userController.user.userType}"/></li>
+            <li>Subject: <h:outputText value="#{userController.getSelectedSubjects()}"/></li>
+        </ul>
+    </ui:define>
+</ui:composition>
+</html>
