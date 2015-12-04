@@ -27,6 +27,16 @@ public class Subject {
     @Valid
     private Location location;
 
+    @Override
+    public String toString() {
+        return "Subject{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", users=" + users +
+                ", location=" + location +
+                '}';
+    }
+
     public int getId() {
         return id;
     }
@@ -58,4 +68,6 @@ public class Subject {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+
 }

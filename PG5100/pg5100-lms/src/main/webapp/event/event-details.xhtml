@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+        >
+<ui:composition template="../template.xhtml">
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewParam name="id" value="#{eventController.selectedId}"/>
+            <f:viewAction action="#{eventController.initEvent()}"/>
+        </f:metadata>
+
+        <h2><h:outputText value="#{eventController.event.title}"/></h2>
+        <ul>
+            <li>Id: <h:outputText value="#{eventController.event.id}"/></li>
+            <li>Type: <h:outputText value="#{eventController.event.eventType}"/></li>
+            <li>Type: <h:outputText value="#{eventController.event.description}"/></li>
+            <li>Type: <h:outputText value="#{eventController.event.startDateTime}"/></li>
+            <li>Type: <h:outputText value="#{eventController.event.endDateTime}"/></li>
+            <li>Subject: <h:outputText value="#{eventController.event.subject.name}"/></li>
+        </ul>
+    </ui:define>
+</ui:composition>
+</html>
