@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="../template.xhtml">
+    <ui:define name="content">
+        <h:form>
+            <p:messages/>
+            <h:outputLabel for="title" value="Title"/>
+            <h:inputText id="title" value="#{eventController.event.title}"/>
+            <br/>
+            <h:outputLabel for="description" value="Description"/>
+            <h:inputText id="description" value="#{eventController.event.description}"/>
+            <br/>
+            <h:outputLabel for="startDate" value="Start"/>
+            <p:calendar id="startDate" value="#{eventController.event.startDateTime}"/>
+            <br/>
+            <h:outputLabel for="endDate" value="End"/>
+            <p:calendar id="endDate" value="#{eventController.event.endDateTime}"/>
+            <br/>
+            <h:outputLabel for="eventType" value="Type"/>
+            <h:selectOneMenu id="eventType" value="#{eventController.event.eventType}">
+                <f:selectItems value="#{eventController.getEventTypes()}"/>
+            </h:selectOneMenu>
+            <br/>
+            <h:outputLabel for="subject" value="Subject"/>
+            <h:selectOneMenu id="subject" value="#{eventController.subjectId}">
+                <f:selectItems value="#{subjectController.getSubjects()}"/>
+            </h:selectOneMenu>
+            <br/>
+            <h:commandButton value="Submit" action="#{eventController.persist()}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

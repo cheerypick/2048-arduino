@@ -1,5 +1,6 @@
 package no.nith.pg5100.controller;
 
+import no.nith.pg5100.dto.EventType;
 import no.nith.pg5100.dto.Location;
 import no.nith.pg5100.dto.Subject;
 import no.nith.pg5100.dto.User;
@@ -14,6 +15,7 @@ import javax.faces.model.SelectItem;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Model
 public class SubjectController {
@@ -105,5 +107,11 @@ public class SubjectController {
         subject.setUsers(users);
 
         subjectDao.persist(subject);
+    }
+
+    public List<SelectItem> getSubjects() {
+        return getAll().stream()
+                .map(s -> new SelectItem(s.getId(), s.getName()))
+                .collect(Collectors.toList());
     }
 }

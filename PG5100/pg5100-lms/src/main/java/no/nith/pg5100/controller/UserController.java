@@ -62,4 +62,6 @@ public class UserController {
     public List<String> getSelectedSubjects() {
         return user.getSubjects().stream().map(Subject::getName).collect(Collectors.toList());
     }
+
+
 }

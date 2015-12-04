@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="../template.xhtml">
+    <ui:define name="content">
+        <p:dataTable var="event" value="#{eventController.getAll()}">
+            <p:column headerText="id">
+                <h:outputText value="#{event.id}"/>
+            </p:column>
+
+            <p:column headerText="Title">
+                <h:outputText value="#{event.title}"/>
+            </p:column>
+
+            <p:column headerText="Start date">
+                <h:outputText value="#{event.startDateTime}"/>
+            </p:column>
+
+           <p:column>
+                <p:link outcome="event-details" value="Details">
+                    <f:param name="id" value="#{event.id}" />
+                </p:link>
+            </p:column>
+        </p:dataTable>
+    </ui:define>
+</ui:composition>
+</html>
