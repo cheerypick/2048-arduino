@@ -17,13 +17,25 @@
                 <h:outputText value="#{event.title}"/>
             </p:column>
 
-            <p:column headerText="Start date">
-                <h:outputText value="#{event.startDateTime}"/>
+            <p:column headerText="Start date and time">
+                <h:outputText value="#{event.startDateTime}">
+                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm"/>
+                </h:outputText>
             </p:column>
 
-           <p:column>
+            <p:column headerText="End date and time">
+                <h:outputText value="#{event.endDateTime}">
+                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Place">
+                <h:outputText value="#{event.subject.location}"/>
+            </p:column>
+
+            <p:column>
                 <p:link outcome="event-details" value="Details">
-                    <f:param name="id" value="#{event.id}" />
+                    <f:param name="id" value="#{event.id}"/>
                 </p:link>
             </p:column>
         </p:dataTable>

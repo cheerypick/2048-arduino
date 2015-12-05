@@ -1,5 +1,7 @@
 package no.nith.pg5100.dto;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -20,6 +22,7 @@ public class Subject {
     @Size(min = 0, max = 100)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "USR_SUB")
+    @JsonManagedReference
     private List<User> users;
 
     @ManyToOne

@@ -17,10 +17,14 @@
             <h:inputText id="description" value="#{eventController.event.description}"/>
             <br/>
             <h:outputLabel for="startDate" value="Start"/>
-            <p:calendar id="startDate" value="#{eventController.event.startDateTime}"/>
+            <p:calendar id="startDate"
+                        pattern="MM/dd/yyyy HH:mm:ss"
+                        value="#{eventController.event.startDateTime}"/>
             <br/>
             <h:outputLabel for="endDate" value="End"/>
-            <p:calendar id="endDate" value="#{eventController.event.endDateTime}"/>
+            <p:calendar id="endDate"
+                        pattern="MM/dd/yyyy HH:mm:ss"
+                        value="#{eventController.event.endDateTime}"/>
             <br/>
             <h:outputLabel for="eventType" value="Type"/>
             <h:selectOneMenu id="eventType" value="#{eventController.event.eventType}">

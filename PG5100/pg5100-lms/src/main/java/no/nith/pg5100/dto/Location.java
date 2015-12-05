@@ -20,6 +20,12 @@ public class Location {
         return id;
     }
 
+    @Override
+    public String toString() {
+        return "Room " + room +
+                ", building: " + building;
+    }
+
     public void setId(int id) {
         this.id = id;
     }

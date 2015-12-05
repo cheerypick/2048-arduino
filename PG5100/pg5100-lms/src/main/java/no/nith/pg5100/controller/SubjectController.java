@@ -75,7 +75,7 @@ public class SubjectController {
         this.userIds = userIds;
     }
 
-    public void initSubject() {
+    public void fetchSubject() {
         subject = subjectDao.findById(subjectId);
     }
 

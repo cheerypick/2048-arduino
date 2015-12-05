@@ -35,7 +35,7 @@ public class UserController {
         return userDao.getAll();
     }
 
-    public void initUser() {
+    public void fetchUser() {
         user = userDao.findById(selectedId);
     }
 

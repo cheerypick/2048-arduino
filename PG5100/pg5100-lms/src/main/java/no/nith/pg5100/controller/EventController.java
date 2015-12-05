@@ -9,12 +9,19 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Model;
 import javax.faces.model.SelectItem;
 import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Model
+@Path("events")
 public class EventController {
+
     @Inject
     private EventDao eventDao;
 
@@ -27,11 +34,15 @@ public class EventController {
 
     private int subjectId;
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Event> getAll() {
-        return eventDao.getAll().stream()
+        List<Event> events =  eventDao.getAll().stream()
                 .sorted((e1, e2) ->
                         e2.getStartDateTime() == null ? -1 : e1.getStartDateTime() == null ? 1 : e2.getStartDateTime().compareTo(e1.getStartDateTime()))
                 .collect(Collectors.toList());
+        System.out.println("getAllMessages(): found "+ events.size() + " message(s) on DB");
+        return events;
     }
 
     @PostConstruct
@@ -44,8 +55,17 @@ public class EventController {
         eventDao.persist(event);
     }
 
-    public void initEvent() {
+
+    public void fetchEvent() {
         event = eventDao.findById(selectedId);
+    }
+
+    @GET
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Event fetchEventById(@PathParam("id") int id) {
+
+        return eventDao.findById(id);
     }
 
     public int getSelectedId() {

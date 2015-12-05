@@ -1,5 +1,6 @@
 package no.nith.pg5100.dto;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import no.nith.pg5100.dto.constraint.ValidPassword;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class User {
     private UserType userType;
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+    @JsonBackReference
     private List<Subject> subjects;
 
     public int getId() {

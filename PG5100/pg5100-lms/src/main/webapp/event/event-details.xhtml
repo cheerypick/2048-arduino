@@ -10,16 +10,22 @@
     <ui:define name="content">
         <f:metadata>
             <f:viewParam name="id" value="#{eventController.selectedId}"/>
-            <f:viewAction action="#{eventController.initEvent()}"/>
+            <f:viewAction action="#{eventController.fetchEvent()}"/>
         </f:metadata>
 
         <h2><h:outputText value="#{eventController.event.title}"/></h2>
         <ul>
             <li>Id: <h:outputText value="#{eventController.event.id}"/></li>
             <li>Type: <h:outputText value="#{eventController.event.eventType}"/></li>
-            <li>Type: <h:outputText value="#{eventController.event.description}"/></li>
-            <li>Type: <h:outputText value="#{eventController.event.startDateTime}"/></li>
-            <li>Type: <h:outputText value="#{eventController.event.endDateTime}"/></li>
+            <li>Description: <h:outputText value="#{eventController.event.description}"/></li>
+            <li>Start: <h:outputText value="#{eventController.event.startDateTime}">
+                <f:convertDateTime pattern="dd.MM.yyyy HH:mm"/>
+                </h:outputText>
+            </li>
+            <li>End: <h:outputText value="#{eventController.event.endDateTime}">
+                <f:convertDateTime pattern="dd.MM.yyyy HH:mm"/>
+                </h:outputText>
+            </li>
             <li>Subject: <h:outputText value="#{eventController.event.subject.name}"/></li>
         </ul>
     </ui:define>

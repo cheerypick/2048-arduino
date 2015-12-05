@@ -1,5 +1,7 @@
 package no.nith.pg5100.dto;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -42,8 +44,21 @@ public class Event {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "FK_SUBJECT")
+    @JsonManagedReference
     private Subject subject;
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", eventType=" + eventType +
+                ", startDateTime=" + startDateTime +
+                ", endDateTime=" + endDateTime +
+                ", subject=" + subject +
+                '}';
+    }
 
     public int getId() {
         return id;
