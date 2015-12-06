@@ -1,0 +1,58 @@
+
+<div class="container">
+
+
+    <h3>Events</h3>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Start</th>
+            <th>End</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-ng-repeat-start="event in events">
+
+            <td>{{ event.id }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.startDateTime }}</td>
+            <td>{{ event.endDateTime }}</td>
+            <td>
+                <button class="btn" data-ng-if="!event.expanded" data-ng-click="event.expanded = true">
+                    <span class="glyphicon glyphicon-collapse-down"></span>  See details
+                </button>
+                <button class="btn" data-ng-if="event.expanded" data-ng-click="event.expanded = false">
+                    <span class="glyphicon glyphicon-collapse-up"></span>  Collapse
+                </button>
+            </td>
+
+        </tr>
+        <tr data-ng-if="event.expanded" data-ng-repeat-end="">
+            <td colspan="5">
+                <h3>Description: </h3>{{event.description}}
+                <br/>
+                <h3>Place:</h3>
+                {{event.subject.location.building}}, room {{event.subject.location.room}}
+                <br/>
+                <h3>Subject:</h3>
+                {{event.subject.name}}
+                <br/>
+                <a class="button" data-ng-href="events/{{event.id}}">
+                    <span class="glyphicon glyphicon-folder-open"></span> 
+                    See details on new page</a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+    <hr>
+    <button class="btn btn-success" ng-click="editUser('new')">
+        <span class="glyphicon glyphicon-user"></span>  Create New User
+    </button>
+    <hr>
+</div>
