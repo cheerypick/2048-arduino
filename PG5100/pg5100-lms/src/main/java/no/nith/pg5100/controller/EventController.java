@@ -1,19 +1,26 @@
 package no.nith.pg5100.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import no.nith.pg5100.dto.Event;
 import no.nith.pg5100.dto.EventType;
 import no.nith.pg5100.infrastructure.event.EventDao;
 import no.nith.pg5100.infrastructure.subject.SubjectDao;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Model;
 import javax.faces.model.SelectItem;
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.json.JsonObject;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,11 +57,31 @@ public class EventController {
         event = new Event();
     }
 
+
     public void persist() {
         event.setSubject(subjectDao.findById(subjectId));
         eventDao.persist(event);
     }
 
+    @POST()
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void addEvent(JsonObject jsonObject) throws ParseException {
+
+        Event e = new Event();
+        String title = jsonObject.getString("title");
+        DateFormat format = new SimpleDateFormat("mm-dd-yyyy");
+        Date start = format.parse(jsonObject.getString("startDateTime"));
+        Date end = format.parse(jsonObject.getString("startDateTime"));
+        int subjectId = Integer.parseInt(jsonObject.getString("subject"));
+
+        e.setTitle(title);
+        e.setEndDateTime(end);
+        e.setStartDateTime(start);
+        e.setSubject(subjectDao.findById(subjectId));
+
+        eventDao.persist(e);
+
+    }
 
     public void fetchEvent() {
         event = eventDao.findById(selectedId);

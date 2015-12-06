@@ -1,0 +1,66 @@
+<!DOCTYPE>
+<html ng-app="testApp">
+<head>
+    <meta charset="UTF-8">
+    <title>PG5100 Home Exam</title>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <script src="js/TestService.js"></script>
+    <script src="js/TestController.js"></script>
+    <script src="js/EventController.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+</head>
+<body>
+
+
+<div class="container" ng-controller="EventController">
+
+    <h3>Events</h3>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Start</th>
+            <th>End</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-ng-repeat-start="event in events">
+
+            <td>{{ event.id }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.startDateTime }}</td>
+            <td>{{ event.endDateTime }}</td>
+            <td>
+                <button class="btn" data-ng-if="!event.expanded" data-ng-click="event.expanded = true">
+                    <span class="glyphicon glyphicon-collapse-down"></span> 
+                </button>
+                <button class="btn" data-ng-if="event.expanded" data-ng-click="event.expanded = false">
+                    <span class="glyphicon glyphicon-collapse-up"></span> 
+                </button>
+            </td>
+        </tr>
+        <tr data-ng-if="event.expanded" data-ng-repeat-end="">
+            <td colspan="5">
+                <h3>Description: </h3>{{event.description}}
+                <br/>
+                <h3>Place:</h3>
+                {{event.subject.location.building}}, room
+
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+    <hr>
+    <button class="btn btn-success" ng-click="editUser('new')">
+        <span class="glyphicon glyphicon-user"></span>  Create New User
+    </button>
+    <hr>
+</div>
+<br/>
+</body>
+</html>

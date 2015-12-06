@@ -41,7 +41,7 @@
                 <h3>Subject:</h3>
                 {{event.subject.name}}
                 <br/>
-                <a class="button" data-ng-href="events/{{event.id}}">
+                <a class="button" data-ng-href="#/app/events/{{event.id}}">
                     <span class="glyphicon glyphicon-folder-open"></span> 
                     See details on new page</a>
             </td>
@@ -51,8 +51,8 @@
     </table>
 
     <hr>
-    <button class="btn btn-success" ng-click="editUser('new')">
-        <span class="glyphicon glyphicon-user"></span>  Create New User
-    </button>
+    <a class="button btn btn-success" href="#/app/create-event">
+        <span class="glyphicon glyphicon-plus"></span>  Create New Event
+    </a>
     <hr>
 </div>

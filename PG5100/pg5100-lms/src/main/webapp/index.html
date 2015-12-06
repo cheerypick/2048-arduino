@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE>
+<html ng-app="app" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title>AngularJS</title>
+    <title>PG5100 Home Exam</title>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/af.js"></script>
+    <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular-route.js"></script>
+    <script src="https://rawgit.com/dalelotts/angular-bootstrap-datetimepicker/master/src/js/datetimepicker.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.11.0.js"></script>
+    <script src="js/app.js"></script>
+
+    <!--    <script src="js/TestController.js"></script>-->
+    <!--
+        <script src="js/EventController.js"></script>
+    -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 </head>
 <body>
-<ul>
-    <li><a href="data-binding.html">Data binding</a></li>
-    <li><a href="controller.html">Controller</a></li>
-    <li><a href="service.html">Service</a></li>
-    <li><a href="http-ws.html">Web Service</a></li>
-</ul>
+<div id="main">
+
+    <!-- angular templating -->
+    <!-- this is where content will be injected -->
+    <div data-ng-view></div>
+
+</div>
+
 </body>
 </html>

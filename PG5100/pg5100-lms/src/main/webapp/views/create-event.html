@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label" for="title">Title:</label>
+
+        <div class="controls">
+            <input type="text" id="title" ng-model="event.title"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="description">Description:</label>
+
+        <div class="controls">
+            <input type="text" id="description" ng-model="event.description"/>
+        </div>
+    </div>
+    <!-- This is a nice datetimepicker which could look so awesome, but I don't have enough
+    time to debug failing moment.js dependencies -->
+
+    <!-- <div class="dropdown">
+         <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="">
+             <div class="input-group">
+                 <input type="text" class="form-control" data-ng-model="data.date">
+                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+             </div>
+         </a>
+         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+             <datetimepicker data-ng-model="data.date"
+                             data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }">
+             </datetimepicker>
+         </ul>
+     </div>
+ -->
+
+    <div class="control-group">
+        <label class="control-label" for="start">Start:</label>
+
+        <div class="controls">
+            <input type="text" id="start" ng-model="event.startDateTime"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="start">End:</label>
+        <div class="controls">
+            <input type="text" id="end" ng-model="event.endDateTime"/>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label for="sel1">Select subject:</label>
+        <select class="form-control"  ng-model="event.subject" id="sel1">
+            <option>1</option>
+            <option>2</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <div class="controls">
+
+            <!-- user-creation.html: -->
+            <a ng-click="createEvent()" class="btn btn-small btn-primary">Create new Event</a>
+        </div>
+    </div>
+
+</form>
+</div>
+
+</body>
+</html>

@@ -1,17 +1,20 @@
-angular.module('testApp').controller('TestController', ['$scope', '$http', 'greetingService', function ($scope, $http, greetingService) {
-    $scope.greeting = function () {
-        return "Hello World!";
+angular.module('testApp').controller('EventDetailsController', ['$scope', '$http', function ($scope, $http) {
 
-    };
 
-    $scope.greetingService = function () {
-        $scope.result = greetingService.greeting($scope.name);
-    };
 
-    $scope.getBook = function () {
-        $http.get('services/events/1').success(function (data) {
-            $scope.result = data.title;
+    $scope.getEvents = function () {
+        $http.get('services/events/').success(function (response) {
+            $scope.events = response;
         });
-    }
+    };
+
+    $scope.createUser = function () {
+        $http.post('services/events/').success(function (response) {
+            $scope.events = response;
+        });
+    };
+
+
+    $scope.getEvents()
 }]);
 

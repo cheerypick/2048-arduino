@@ -1,5 +1,6 @@
 package no.nith.pg5100.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -33,11 +34,13 @@ public class Event {
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     @Column(table = "EVENT_DETAILS")
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd, HH:00", timezone="CET")
     private Date startDateTime;
 
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     @Column(table = "EVENT_DETAILS")
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd, HH:00", timezone="CET")
     private Date endDateTime;
 
  //   @Valid

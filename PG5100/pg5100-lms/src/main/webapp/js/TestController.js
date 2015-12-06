@@ -1,4 +1,4 @@
-angular.module('eventApp').controller('TestController', ['$scope', '$http', 'greetingService', function ($scope, $http, greetingService) {
+angular.module('testApp').controller('TestController', ['$scope', '$http', 'greetingService', function ($scope, $http, greetingService) {
     $scope.greeting = function () {
         return "Hello World!";
 
