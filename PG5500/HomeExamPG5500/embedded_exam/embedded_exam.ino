@@ -25,7 +25,7 @@ const int count = 4;
 int pressed = -1; //this variable will determine whether joystick has been pressed down (selected)
 int x = -1;
 int y = -1; //this variable will hold the Y-coordinate value
-String direction, action;
+//String direction, action;
 
 bool stickReleased = true;
 
@@ -50,38 +50,11 @@ void setup() {
   // pinMode(SwButtonPin, INPUT_PULLUP); //sets the SW switch as input
   Serial.begin(57600);
 
-  //  printGrid();
-
-
-
-
-  // printGrid();
-
+ 
   placeRandomTile();
   placeRandomTile();
-  placeRandomTile();
-
-  //printGrid();
-
-  placeRandomTile();
-
-
-  // printGrid(); placeRandomTile();
-
-
-  placeRandomTile();
-  placeRandomTile();
-  placeRandomTile();
-  placeRandomTile();
-  placeRandomTile();
-
-  Serial.println();
-  printGrid();
-  Serial.println();
   //moveLeft();
-  moveDown();
-  // printGrid();
-  Serial.println ("Result:");
+  
   printGrid();
   // TFTscreen.begin();
   // clear the screen with a black background
@@ -124,7 +97,7 @@ void processLine( int line[] ) {
 
       }
 
-      line[count - removed] = 0;
+      line[count - removed - 1] = 0;
 
 
     }
@@ -214,6 +187,7 @@ void moveLeft() {
     }
 
   }
+
 }
 
 
@@ -245,6 +219,8 @@ void printLine( int line[] ) {
 }
 
 void printGrid() {
+  Serial.println();
+  
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
 
@@ -255,57 +231,80 @@ void printGrid() {
 }
 
 void loop() {
+ readJoystick();
+ handleJoystick();
 
-  // print a random number from 0 to 299
-  //randNumber = random(300);
-  // Serial.println(randNumber);
-
-  // print a random number from 10 to 19
-  //randNumber = random(10, 20);
-  //Serial.println(randNumber);
-
-  // delay(500);
-
+  delay(200);
 }
 
-/*
+enum Direction {UNDEF, UP, DOWN, RIGHT, LEFT };
+
+Direction  direction;
+Direction action;
 
 void handleJoystick() {
-    if (x < 5) {
-        direction = "up";
-    }
-    if (x > 1020) {
-        direction = "down";
-    }
-    if (y < 5) {
-        direction = "left";
-    }
-    if (y > 1020) {
-        stickReleased = false;
-        direction = "right";
-    }
-    if (x > 450 && x < 550 && y > 450 && y < 550 && direction != "") {
-        action = direction;
+  if (x < 5) {
+    direction = UP;
+  }
+  if (x > 1020) {
+    direction = DOWN;
+  }
+  if (y < 5) {
+    direction = LEFT;
+  }
+  if (y > 1020) {
+    direction = RIGHT;
+  }
+  if (x > 450 && x < 550 && y > 450 && y < 550 && direction) {
+    action = direction;
 
-        if (action == "left" || action == "right")
-        }
+    switch (action) {
+      case UP:
+        moveUp();
+        printGrid();
+        placeRandomTile();
+        
+        break;
 
+      case DOWN:
+        moveDown();
+        printGrid();
+        placeRandomTile();
+        break;
+
+
+      case LEFT:
+        moveLeft();
+        printGrid();
+        placeRandomTile();
+        break;
+
+
+      case RIGHT:
+        moveRight();
+        printGrid();
+        placeRandomTile();
+        break;
 
     }
+
+    //set direction and action to 0
+    direction = UNDEF;
+    action = UNDEF;
+    
+
+  }
 
 }
 
 
 
 void readJoystick() {
-    pressed = !digitalRead(SwButtonPin);//reads whether joystick has been pressed down (selected) or not
-    x = analogRead(VRxPin);//reads the X-coordinate value
-    y = analogRead(VRyPin);//reads the Y-coordinate value
+  pressed = !digitalRead(SwButtonPin);//reads whether joystick has been pressed down (selected) or not
+  x = analogRead(VRxPin);//reads the X-coordinate value
+  y = analogRead(VRyPin);//reads the Y-coordinate value
 }
 
 
 
-void placeNewRandomCell () {
-
-*/
 
