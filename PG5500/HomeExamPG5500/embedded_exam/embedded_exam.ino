@@ -1,6 +1,26 @@
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7735.h>
+
+// Color definitions
+#define BLACK 0x0000
+#define BLUE 0x001F
+#define RED 0xF800
+#define GREEN 0x07E0
+#define CYAN 0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW 0xFFE0
+#define WHITE 0xFFFF
+
+#define BEIGE_2 0xC618
+#define BEIGE_4 0xEF19
+#define ORANGE_8 0xF58F
+#define PEACH_16 0xF4AC
+#define RED_32 0xF3EB
 
 
-#include <TFT.h>  // Arduino LCD library
+
+
+
 // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
 #include <SPI.h>
 #include <Wire.h>
@@ -12,7 +32,7 @@
 #define RST  8
 
 
-TFT TFTscreen = TFT(CS, DC, RST);
+Adafruit_ST7735 tft = Adafruit_ST7735(CS, DC, RST);
 
 long randNumber;
 
@@ -25,9 +45,7 @@ const int count = 4;
 int pressed = -1; //this variable will determine whether joystick has been pressed down (selected)
 int x = -1;
 int y = -1; //this variable will hold the Y-coordinate value
-//String direction, action;
 
-bool stickReleased = true;
 
 
 
@@ -38,30 +56,34 @@ int grid [4][4] = {
   {0, 0, 0, 0}   /*  initializers for row indexed by 3 */
 };
 
-int i, j;
+int i, j, xPos, yPos;
 
 void setup() {
 
 
+  tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
+  //tft.setRotation(1);
+  tft.fillScreen(BEIGE_2);
+
+  //draw tiles
+
+  for (xPos = 2; xPos <= 100; xPos += 31) {
+    for (yPos = 2; yPos <= 100; yPos += 31) {
+      tft.drawRoundRect(xPos, yPos, 32, 32, 3, BLACK);
+    }
+  }
+  
   //generate random seed based on noise from unconnected pin 0
   randomSeed(analogRead(0));
-
-
-  // pinMode(SwButtonPin, INPUT_PULLUP); //sets the SW switch as input
   Serial.begin(57600);
 
- 
+
   placeRandomTile();
   placeRandomTile();
-  //moveLeft();
-  
+
+  displayGrid();
   printGrid();
-  // TFTscreen.begin();
-  // clear the screen with a black background
-  // TFTscreen.background(0, 0, 0);
-  // TFTscreen.stroke(255, 255, 255);
-  // set the font size
-  // TFTscreen.setTextSize(2);
+
 }
 
 int getRandomTileValue() {
@@ -69,10 +91,7 @@ int getRandomTileValue() {
   return tile;
 }
 
-
 void processLine( int line[] ) {
-
-  //printLine(line);
 
   unsigned int l = 0, removed = 0;
 
@@ -98,8 +117,6 @@ void processLine( int line[] ) {
       }
 
       line[count - removed - 1] = 0;
-
-
     }
   }
 
@@ -195,11 +212,9 @@ void moveLeft() {
 void placeRandomTile() {
   bool found = false;
   while (!found) {
-    int x = random(4);
-    int y = random (4);
+    int x = random(count);
+    int y = random (count);
 
-    //  Serial.print("X:" + x);
-    //  Serial.print("Y:" + y);
     if (!grid [x][y]) {
       grid[x][y] = getRandomTileValue();
       found = true;
@@ -220,9 +235,9 @@ void printLine( int line[] ) {
 
 void printGrid() {
   Serial.println();
-  
-  for (i = 0; i < 4; i++) {
-    for (j = 0; j < 4; j++) {
+
+  for (i = 0; i < count; i++) {
+    for (j = 0; j < count; j++) {
 
       Serial.print(grid[i][j]);
     }
@@ -230,9 +245,29 @@ void printGrid() {
   }
 }
 
+void displayGrid() {
+
+  tft.fillScreen(BEIGE_2);
+  tft.setTextColor(RED);
+  tft.setTextSize(2);
+
+
+  for (yPos = 4, i = 0; i < count; yPos += 31, i++) {
+    for (xPos = 4, j = 0; j < count; xPos += 31, j++) {
+
+      tft.drawRoundRect(xPos - 2, yPos - 2, 32, 32, 3, BLACK);
+      tft.setCursor(xPos, yPos);
+      if (grid[i][j]) {
+        tft.print(grid[i][j]);
+      }
+    }
+  }
+
+}
+
 void loop() {
- readJoystick();
- handleJoystick();
+  readJoystick();
+  handleJoystick();
 
   delay(200);
 }
@@ -261,13 +296,17 @@ void handleJoystick() {
     switch (action) {
       case UP:
         moveUp();
+        Serial.println("Up!");
+        displayGrid();
         printGrid();
         placeRandomTile();
-        
+
         break;
 
       case DOWN:
         moveDown();
+        Serial.println("Down!");
+        displayGrid();
         printGrid();
         placeRandomTile();
         break;
@@ -275,6 +314,8 @@ void handleJoystick() {
 
       case LEFT:
         moveLeft();
+        Serial.println("Left!");
+        displayGrid();
         printGrid();
         placeRandomTile();
         break;
@@ -282,6 +323,8 @@ void handleJoystick() {
 
       case RIGHT:
         moveRight();
+        Serial.println("Right!");
+        displayGrid();
         printGrid();
         placeRandomTile();
         break;
@@ -291,7 +334,7 @@ void handleJoystick() {
     //set direction and action to 0
     direction = UNDEF;
     action = UNDEF;
-    
+
 
   }
 

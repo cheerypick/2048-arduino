@@ -1,0 +1,2 @@
+Adafruit GFX biblioteket bruker fargene i RGB 565 format, komprimert inni en 16-bit variabel, hvor 
+ 5 bits inneholder rød, midterste 6 bits grønn, og siste 5 bits  blå. Så for å få gjenskapt de opprinnelige fargene i det originale spillet, måtte jeg konvertere hexadesimale webfargene til dette formattet.
