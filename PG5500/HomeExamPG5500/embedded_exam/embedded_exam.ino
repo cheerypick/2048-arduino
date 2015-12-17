@@ -25,7 +25,8 @@
 #define TILE_1024_COLOR 0xEE27
 #define TILE_2048_COLOR 0xEE05
 
-#define TILE_WIDTH 31
+#define TILE_WIDTH 30
+#define BORDER_WIDTH 32
 
 // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
 #include <SPI.h>
@@ -63,8 +64,18 @@ int gameBoard [4][4] = {
   {0, 0, 0, 0},   /*  initializers for row indexed by 2 */
   {0, 0, 0, 0}   /*  initializers for row indexed by 3 */
 };
+int previousGameState[4][4];
+int score, previousScore = 0;
 
-int score = 0;
+
+void drawEmptyGrid() {
+ 
+  for (xPos = 1; xPos <= 100; xPos += BORDER_WIDTH) {
+    for (yPos = 1; yPos <= 100; yPos += BORDER_WIDTH) {
+      tft.drawRoundRect(xPos, yPos, BORDER_WIDTH, BORDER_WIDTH, 3, BLACK);
+    }
+  }
+}
 
 void setup() {
 
@@ -73,11 +84,8 @@ void setup() {
 
   //draw tiles
 
-  for (xPos = 2; xPos <= 100; xPos += TILE_WIDTH) {
-    for (yPos = 2; yPos <= 100; yPos += TILE_WIDTH) {
-      tft.drawRoundRect(xPos, yPos, 32, 32, 3, BLACK);
-    }
-  }
+
+  drawEmptyGrid();
 
   //generate random seed based on noise from unconnected pin 0
   randomSeed(analogRead(0));
@@ -85,6 +93,7 @@ void setup() {
 
   placeRandomTile();
   placeRandomTile();
+  memcpy(previousGameState, gameBoard, sizeof(gameBoard));
   displayGameBoard();
 
 }
@@ -246,130 +255,106 @@ int tileValue;
 void displayTile(int col, int row, int value) {
   int yPosition, xPosition;
 
-  yPosition = 2+(col*32);
-  xPosition = 2+(row*32);
-  //tft.drawRoundRect(xPosition - 2, yPosition - 2, 32, 32, 3, BLACK);
-  tft.setCursor(xPos + 7, yPos + 5);
-  switch (tileValue) {
-          case 2: tft.fillRoundRect(xPosition , yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_2_COLOR);
-            break;
+  yPosition = 1 + (col * BORDER_WIDTH);
+  xPosition = 1 + (row * BORDER_WIDTH);
+  tft.setCursor(xPosition + 7, yPosition + 7);
+  // tft.drawRoundRect(xPosition - 2, yPosition - 2, BORDER_WIDTH, BORDER_WIDTH, 3, BLACK);
 
-          case 4: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_4_COLOR);
-            break;
+  tft.setTextSize(2);
 
-          case 8: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_8_COLOR);
-            break;
 
-          case 16: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_16_COLOR);
-            tft.setCursor(xPosition + 4, yPosition + 7);
-            break;
+  switch (value) {
 
-          case 32: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_32_COLOR);
-            tft.setCursor(xPosition + 4, yPosition + 7);
-            break;
+    case 0:
+      tft.drawRoundRect(xPosition, yPosition, BORDER_WIDTH, BORDER_WIDTH, 3, BLACK); 
+      tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, WHITE);
 
-          case 64: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_64_COLOR);
-            tft.setCursor(xPosition + 4, yPosition + 7);
-            break;
+      break;
 
-          case 128: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_128_COLOR);
-            tft.setTextSize(1);
-            break;
+    case 2: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_2_COLOR);
+      break;
 
-          case 256: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_256_COLOR);
-            tft.setTextSize(1);
-            break;
+    case 4: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_4_COLOR);
+      break;
 
-          case 512: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
-            tft.setTextSize(1);
-            break;
+    case 8: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_8_COLOR);
+      break;
 
-          case 1024: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
-            tft.setTextSize(1);
-            break;
+    case 16: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_16_COLOR);
+      tft.setCursor(xPosition + 4, yPosition + 7);
+      break;
 
-          case 2048: tft.fillRoundRect(xPosition, yPosition, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
-            tft.setTextSize(1);
-            break;
-        }
-  
-  
+    case 32: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_32_COLOR);
+      tft.setCursor(xPosition + 4, yPosition + 7);
+      break;
+
+    case 64: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_64_COLOR);
+      tft.setCursor(xPosition + 4, yPosition + 7);
+      break;
+
+    case 128: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_128_COLOR);
+      tft.setTextSize(1);
+      break;
+
+    case 256: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_256_COLOR);
+      tft.setTextSize(1);
+      break;
+
+    case 512: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
+      tft.setTextSize(1);
+      break;
+
+    case 1024: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
+      tft.setTextSize(1);
+      break;
+
+    case 2048: tft.fillRoundRect(xPosition+1 , yPosition+1, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
+      tft.setTextSize(1);
+      break;
+  }
+  if (value) {
+    tft.print(value);
+  }
 }
 
 void displayGameBoard() {
 
+
+
   //Console output for debugging purposes
   printGameBoard();
 
-  tft.fillScreen(WHITE);
+
+  // tft.fillScreen(WHITE);
   tft.setTextColor(BLACK);
 
-  for (yPos = 4, i = 0; i < count; yPos += TILE_WIDTH, i++) {
-    for (xPos = 4, j = 0; j < count; xPos += TILE_WIDTH, j++) {
-
-      tft.setTextSize(2);
-      tft.drawRoundRect(xPos - 2, yPos - 2, 32, 32, 3, BLACK);
-      tft.setCursor(xPos + 7, yPos + 5);
+  for (i = 0; i < count; i++) {
+    for (j = 0; j < count; j++) {
 
       tileValue = gameBoard[i][j];
-      if (tileValue) {
 
-        switch (tileValue) {
-          case 2: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_2_COLOR);
-            break;
-
-          case 4: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_4_COLOR);
-            break;
-
-          case 8: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_8_COLOR);
-            break;
-
-          case 16: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_16_COLOR);
-            tft.setCursor(xPos + 2, yPos + 5);
-            break;
-
-          case 32: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_32_COLOR);
-            tft.setCursor(xPos + 2, yPos + 5);
-            break;
-
-          case 64: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_64_COLOR);
-            tft.setCursor(xPos + 2, yPos + 5);
-            break;
-
-          case 128: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_128_COLOR);
-            tft.setTextSize(1);
-            break;
-
-          case 256: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_256_COLOR);
-            tft.setTextSize(1);
-            break;
-
-          case 512: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
-            tft.setTextSize(1);
-            break;
-
-          case 1024: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
-            tft.setTextSize(1);
-            break;
-
-          case 2048: tft.fillRoundRect(xPos - 2, yPos - 2, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
-            tft.setTextSize(1);
-            break;
-        }
-        tft.print(tileValue);
+      if (previousGameState[i][j] != gameBoard[i][j]) {
+        Serial.println("DiaplayTile");
+        displayTile(i, j, tileValue);
       }
     }
   }
 
+  memcpy(previousGameState, gameBoard, sizeof(gameBoard));
+  
   tft.setTextSize(1);
   tft.setCursor(10, 140);
   tft.setTextColor(RED);
-  
+
   tft.print("Score: ");
   tft.setTextSize(2);
   tft.setCursor(50, 135);
+  if (previousScore != score) {
+   // tft.drawRect(10, 140, 30, 60, WHITE);
+    tft.fillRect(50, 135, 30, 60, WHITE);
+  }
   tft.print(score);
-  
+
 }
 
 void loop() {
