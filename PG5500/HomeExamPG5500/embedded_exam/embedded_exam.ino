@@ -1,9 +1,7 @@
 #include <SD.h>
-//#include <Adafruit_GFX.h>
-//#include <Adafruit_ST7735.h>
-#include <TFT.h>  // Arduino LCD library
-
-
+#include <TFT.h>  
+#include <SPI.h>
+#include "pitches.h"
 
 // Color definitions from standard lib
 #define BLACK 0x0000
@@ -14,7 +12,6 @@
 #define MAGENTA 0xF81F
 #define YELLOW 0xFFE0
 #define WHITE 0xFFFF
-
 
 //Specific 2048 tile colors
 #define TILE_2_COLOR 0xEF3B
@@ -32,16 +29,12 @@
 #define TILE_WIDTH 30
 #define BORDER_WIDTH 32
 
-// Date and time functions using a DS1307 RTC connected via I2C and Wire lib
-#include <SPI.h>
-#include <Wire.h>
-
+#define BUZZER_PIN 6
 
 // TFT pin definitions and declarations
 #define CS   10
 #define DC   9
 #define RST  8
-
 #define SD_CS 4
 
 Adafruit_ST7735 tft = Adafruit_ST7735(CS, DC, RST);
@@ -53,18 +46,22 @@ long randNumber;
 const int VRxPin = A2; //VRx pin connected to arduino pin A2
 const int VRyPin = A3; //VRy pin connected to arduino in A3
 const int SwButtonPin = 7; //SW pin connected to arduino pin D7
+
+
 const int count = 4;
 
 //Joystick state variables
-int pressed = -1; //this variable will determine whether joystick has been pressed down (selected)
+int pressed = -1;
 int x = -1;
 int y = -1;
 
-//Move directions
 enum Direction {UNDEF, UP, DOWN, RIGHT, LEFT };
 Direction  direction, action;
 
-bool canMoveLeft, canMoveRight, canMoveUp, canMoveDown, waitingMode, gameMode;
+bool canMoveLeft, canMoveRight, canMoveUp, canMoveDown, waitingMode, gameMode, isGameOver;
+File myFile;
+int score, previousScore = 0;
+int tileValue;
 
 //Grid variables
 int i, j, xPos, yPos;
@@ -75,9 +72,22 @@ int gameBoard [4][4] = {
   {0, 0, 0, 0}   /*  initializers for row indexed by 3 */
 };
 
-int gridCopy[4][4], gridCopyInitial[4][4], previousGameState[4][4];
+int gridCopy[4][4], gridCopyInitial[4][4];
 
-int score, previousScore = 0;
+int  previousGameState [4][4] =  {
+  {0, 0, 0, 0} ,
+  {0, 0, 0, 0} ,
+  {0, 0, 0, 0},
+  {0, 0, 0, 0}
+};
+
+int  emptyGameState [4][4] =  {
+  {0, 0, 0, 0} ,
+  {0, 0, 0, 0} ,
+  {0, 0, 0, 0},
+  {0, 0, 0, 0}
+};
+
 
 void drawEmptyGrid() {
 
@@ -88,47 +98,122 @@ void drawEmptyGrid() {
   }
 }
 
+
+
+
 void setup() {
 
+  initializeSD();
   waitingMode = true;
 
-  pinMode(SwButtonPin, INPUT_PULLUP); //sets the SW switch as input
-  
+  pinMode(SwButtonPin, INPUT_PULLUP); //sets the joystick SW as input button
+
   tft.initR(INITR_BLACKTAB);
   tft.fillScreen(WHITE);
 
   //generate random seed based on noise from unconnected pin 0
   randomSeed(analogRead(0));
   Serial.begin(57600);
+  displayImage();
+  writeHighScore(315);
+  readHighScore();
+}
 
 
+void loop() {
+
+  readJoystick();
+  if (pressed && waitingMode) {
+    startGame();
+  }
+
+  if (!waitingMode && !isGameOver) {
+    playGame();
+  }
+
+  if (isGameOver) {
+    waitingMode = true;
+    printGameOver();
+  }
+  delay(50);
+}
+
+void writeHighScore(int score)  {
+  if (SD.exists("score.txt")) {
+    SD.remove("score.txt");
+    myFile = SD.open("score.txt", FILE_WRITE);
+    myFile.println(score);
+    myFile.close();
+  } else {
+    Serial.println("File doesn't exist.");
+  }
+}
+
+
+void readHighScore()  {
+  if (SD.exists("score.txt")) {
+    myFile = SD.open("score.txt");
+    if (myFile) {
+      while (myFile.available()) {
+        int highScore = myFile.parseInt();
+        Serial.println(highScore);
+      }
+      myFile.close();
+    } else {
+      Serial.println("Error opening file. ");
+    }
+  } else {
+    Serial.println("File doesn't exist.");
+  }
+}
+
+
+void printGameOver () {
+  tft.fillScreen(WHITE);
+  tft.stroke(RED);
+  tft.text("Game Over", 10, 10);
+  tft.setTextSize(1);
+  tft.text("Press joystick \n to restart game", 10, 60);
+  printScore();
+}
+
+
+void initializeSD() {
   if (!SD.begin(SD_CS)) {
     Serial.println(F("failed!"));
     return;
   }
   Serial.println(F("OK!"));
 
-
   logo = tft.loadImage("2048.bmp");
   if (!logo.isValid()) {
-    Serial.println(F("error while loading arduino.bmp"));
+    Serial.println(F("error while loading 2048.bmp"));
   }
+}
 
-  tft.image(logo, 1, 1);
+void displayImage() {
 
+  tft.image(logo, 0, 0);
+  tft.stroke(WHITE);
+  tft.text("Press joystick \n to start", 10, 60);
 }
 
 void startGame() {
 
   waitingMode = false;
-  
-  //draw tiles
+  resetGameState();
   tft.fillScreen(WHITE);
   drawEmptyGrid();
   placeRandomTile();
   placeRandomTile();
-  memcpy(previousGameState, gameBoard, sizeof(gameBoard));
   displayGameBoard();
+}
+
+void resetGameState() {
+ memcpy (previousGameState, emptyGameState, sizeof(emptyGameState));
+ memcpy (gameBoard, emptyGameState, sizeof(emptyGameState));
+ isGameOver = false;
+ score, previousScore = 0;
 }
 
 int getRandomTileValue() {
@@ -153,15 +238,14 @@ void processLine( int line[], bool setScore ) {
 
   for ( unsigned int j = 1; j < count - removed; j++ ) {
     if ( line[j] == line[j - 1] ) {
-
+      
       line[j - 1] *= 2;
       if (setScore) {
+        playSound();
         score += line [j - 1];
-        
       }
       for ( unsigned int k = j; k < count - removed; k++ ) {
         line[k] = line[k + 1];
-
       }
 
       line[count - removed - 1] = 0;
@@ -174,8 +258,7 @@ void processLine( int line[], bool setScore ) {
 void moveUp(int grid[4][4], bool setScore) {
 
 
-  for (int i = 0; i < count; i++) { // iterating rows first
-
+  for (int i = 0; i < count; i++) {
     int line[count];
 
     for (int j = 0; j < count; j++) {
@@ -183,7 +266,6 @@ void moveUp(int grid[4][4], bool setScore) {
     }
 
     processLine( line, setScore );
-
 
     for (int j = 0; j < count; j++) {
       grid[j][i] = line[j];
@@ -195,8 +277,7 @@ void moveUp(int grid[4][4], bool setScore) {
 void moveDown(int grid[4][4], bool setScore) {
 
 
-  for (int i = 0; i < count; i++) { // iterating rows first
-
+  for (int i = 0; i < count; i++) {
     int line[count];
 
     for (int j = 0; j < count; j++) {
@@ -204,7 +285,6 @@ void moveDown(int grid[4][4], bool setScore) {
     }
 
     processLine( line, setScore );
-
 
     for (int j = 0; j < count; j++) {
       grid[j][i] = line[count - j - 1];
@@ -263,8 +343,6 @@ void placeRandomTile() {
   }
 }
 
-int tileValue;
-
 
 void displayTile(int col, int row, int value) {
   int yPosition, xPosition;
@@ -272,8 +350,6 @@ void displayTile(int col, int row, int value) {
   yPosition = 1 + (col * BORDER_WIDTH);
   xPosition = 1 + (row * BORDER_WIDTH);
   tft.setCursor(xPosition + 7, yPosition + 7);
-  // tft.drawRoundRect(xPosition - 2, yPosition - 2, BORDER_WIDTH, BORDER_WIDTH, 3, BLACK);
-
   tft.setTextSize(2);
 
 
@@ -307,22 +383,28 @@ void displayTile(int col, int row, int value) {
       break;
 
     case 128: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_128_COLOR);
+      tft.setCursor(xPosition + 7, yPosition + 13);
       tft.setTextSize(1);
       break;
 
     case 256: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_256_COLOR);
+
+      tft.setCursor(xPosition + 7, yPosition + 13);
       tft.setTextSize(1);
       break;
 
     case 512: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
+      tft.setCursor(xPosition + 7, yPosition + 13);
       tft.setTextSize(1);
       break;
 
-    case 1024: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
+    case 1024: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_1024_COLOR);
+      tft.setCursor(xPosition + 7, yPosition + 13);
       tft.setTextSize(1);
       break;
 
-    case 2048: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_512_COLOR);
+    case 2048: tft.fillRoundRect(xPosition + 1 , yPosition + 1, TILE_WIDTH, TILE_WIDTH, 3, TILE_2048_COLOR);
+      tft.setCursor(xPosition + 7, yPosition + 13);
       tft.setTextSize(1);
       break;
   }
@@ -333,57 +415,34 @@ void displayTile(int col, int row, int value) {
 
 void displayGameBoard() {
 
-
-
-  //Console output for debugging purposes
- // printGameBoard();
-
-
-  // tft.fillScreen(WHITE);
   tft.setTextColor(BLACK);
 
   for (i = 0; i < count; i++) {
     for (j = 0; j < count; j++) {
-
       tileValue = gameBoard[i][j];
-
       if (previousGameState[i][j] != gameBoard[i][j]) {
-        
         displayTile(i, j, tileValue);
       }
     }
   }
 
   memcpy(previousGameState, gameBoard, sizeof(gameBoard));
+  printScore();
 
+}
+
+void printScore () {
   tft.setTextSize(1);
   tft.setCursor(10, 140);
   tft.setTextColor(RED);
-
   tft.print("Score: ");
   tft.setTextSize(2);
   tft.setCursor(50, 135);
   if (previousScore != score) {
-    // tft.drawRect(10, 140, 30, 60, WHITE);
     tft.fillRect(50, 135, 50, 50, WHITE);
   }
   tft.print(score);
-
 }
-
-void loop() {
-
-  
-  readJoystick();
-  if(pressed && waitingMode) {
-    startGame();
-  }
-  if(!waitingMode) {
-    handleJoystick();
-    }
-  delay(50);
-}
-
 
 
 
@@ -397,28 +456,26 @@ void checkAvailableMoves() {
 
   memcpy(gridCopy, gridCopyInitial, sizeof(gridCopyInitial));
   moveUp(gridCopy, 0);
-  canMoveUp = memcmp (gridCopy, gridCopyInitial, sizeof (gridCopyInitial));
+  canMoveUp =  memcmp (gridCopy, gridCopyInitial, sizeof (gridCopyInitial));
 
   memcpy(gridCopy, gridCopyInitial, sizeof(gridCopyInitial));
   moveDown(gridCopy, 0);
-  canMoveDown = memcmp (gridCopy, gridCopyInitial, sizeof (gridCopyInitial));
+  canMoveDown =  memcmp (gridCopy, gridCopyInitial, sizeof (gridCopyInitial));
 
   memcpy(gridCopy, gridCopyInitial, sizeof(gridCopyInitial));
   moveRight(gridCopy, 0);
-  canMoveRight = memcmp (gridCopy, gridCopyInitial, sizeof (gridCopyInitial));
+  canMoveRight =  memcmp (gridCopy, gridCopyInitial, sizeof (gridCopyInitial));
+
+  isGameOver = !(canMoveLeft || canMoveRight || canMoveUp || canMoveDown);
 
 }
 
-bool isGameOver() {
-  return !canMoveLeft && !canMoveRight && !canMoveUp && !canMoveDown;
-}
-
-void handleJoystick() {
+void playGame() {
   if (x < 5) {
     direction = DOWN;
   }
   if (x > 1020) {
-    direction = DOWN;
+    direction = UP;
   }
   if (y < 5) {
     direction = RIGHT;
@@ -430,65 +487,51 @@ void handleJoystick() {
     action = direction;
     checkAvailableMoves();
 
-    //   while (!isGameOver) {
     switch (action) {
       case UP:
 
         if (canMoveUp) {
-          Serial.print("UP");
           moveUp(gameBoard, 1);
           displayGameBoard();
           placeRandomTile();
           displayGameBoard();
-
         }
         break;
 
       case DOWN:
-        
+
         if (canMoveDown) {
-Serial.print("DOWN");
           moveDown(gameBoard, 1);
           displayGameBoard();
           placeRandomTile();
           displayGameBoard();
-
         }
         break;
 
-
       case LEFT:
-Serial.print("LEFT");
+
         if (canMoveLeft) {
           moveLeft(gameBoard, 1);
           displayGameBoard();
           placeRandomTile();
           displayGameBoard();
-
         }
         break;
 
 
       case RIGHT:
-      Serial.print("RIGHT");
 
         if (canMoveRight) {
           moveRight(gameBoard, 1);
           displayGameBoard();
           placeRandomTile();
           displayGameBoard();
-
-
         }
         break;
-
     }
 
-    //set direction and action to 0
     direction = UNDEF;
     action = UNDEF;
-
-
     checkAvailableMoves();
 
   }
@@ -501,4 +544,18 @@ void readJoystick() {
   y = analogRead(VRyPin);//reads the Y-coordinate value
 }
 
+
+
+////SOUNDS
+
+void playSound() {
+ tone(BUZZER_PIN,NOTE_G4,35);
+  delay(35);
+  tone(BUZZER_PIN,NOTE_G5,35);
+  delay(35);
+  tone(BUZZER_PIN,NOTE_G6,35);
+  delay(35);
+  noTone(BUZZER_PIN);
+  noTone(BUZZER_PIN);
+}
 
